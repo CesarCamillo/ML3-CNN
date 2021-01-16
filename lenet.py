@@ -32,7 +32,7 @@ def main(caminho):
 
     train_generator = train_datagen.flow_from_directory(
         directory = caminho,
-        target_size=(32,32),
+        target_size=(128,128),
         batch_size=BATCH_SIZE,
         class_mode='categorical',
         subset='training',
@@ -41,7 +41,7 @@ def main(caminho):
 
     validation_generator = train_datagen.flow_from_directory(
         directory = caminho, # same directory as training data
-        target_size=(32, 32),
+        target_size=(128, 128),
         batch_size=BATCH_SIZE,
         class_mode='categorical',
         subset='validation',
@@ -50,7 +50,7 @@ def main(caminho):
 
     model = keras.Sequential()
 
-    model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(32,32,1)))
+    model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(128,128,1)))
     model.add(layers.AveragePooling2D())
 
     model.add(layers.Conv2D(filters=16, kernel_size=(3, 3), activation='relu'))

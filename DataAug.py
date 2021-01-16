@@ -7,6 +7,21 @@ import os
 import numpy as np
 import random
 
+def create_Directories(destPath):
+    if not os.path.exists(destPath + "/Janeiro"):
+        os.mkdir(destPath + "/Janeiro")
+        os.mkdir(destPath + "/Fevereiro")
+        os.mkdir(destPath + "/Março")
+        os.mkdir(destPath + "/Abril")
+        os.mkdir(destPath + "/Maio")
+        os.mkdir(destPath + "/Junho")
+        os.mkdir(destPath + "/Julho")
+        os.mkdir(destPath + "/Agosto")
+        os.mkdir(destPath + "/Setembro")
+        os.mkdir(destPath + "/Outubro")
+        os.mkdir(destPath + "/Novembro")
+        os.mkdir(destPath + "/Dezembro")
+
 def prepare_Path(destPath, label):
     switcher = {
                 0:'Janeiro',
@@ -26,6 +41,7 @@ def prepare_Path(destPath, label):
     return destPath + "/" + str(mes)
 
 def load_images(originPath, destPath):
+    create_Directories(destPath)
     print ('Loading images...')
     archives = os.listdir(originPath)
     arq = open('label.txt')
