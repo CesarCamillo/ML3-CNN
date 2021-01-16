@@ -34,50 +34,53 @@ def main(caminho):
         directory = caminho,
         target_size=(32,32),
         batch_size=BATCH_SIZE,
-        class_mode=None,
-        subset='training'
+        class_mode='categorical',
+        subset='training',
+        color_mode='grayscale'
     )
 
     validation_generator = train_datagen.flow_from_directory(
         directory = caminho, # same directory as training data
         target_size=(32, 32),
         batch_size=BATCH_SIZE,
-        class_mode=None,
-        subset='validation')
+        class_mode='categorical',
+        subset='validation',
+        color_mode='grayscale'
+    )
 
-    # model = keras.Sequential()
+    model = keras.Sequential()
 
-    # model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(32,32,1)))
-    # model.add(layers.AveragePooling2D())
+    model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(32,32,1)))
+    model.add(layers.AveragePooling2D())
 
-    # model.add(layers.Conv2D(filters=16, kernel_size=(3, 3), activation='relu'))
-    # model.add(layers.AveragePooling2D())
+    model.add(layers.Conv2D(filters=16, kernel_size=(3, 3), activation='relu'))
+    model.add(layers.AveragePooling2D())
 
-    # model.add(layers.Flatten())
+    model.add(layers.Flatten())
 
-    # model.add(layers.Dense(units=120, activation='relu'))
+    model.add(layers.Dense(units=120, activation='relu'))
 
-    # model.add(layers.Dense(units=84, activation='relu'))
+    model.add(layers.Dense(units=84, activation='relu'))
 
-    # model.add(layers.Dense(units=10, activation = 'softmax'))
+    model.add(layers.Dense(units=12, activation = 'softmax'))
 
-    # model.summary()
+    model.summary()
 
-    # model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])    
+    model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])    
 
-    # model.fit_generator(
-    #     train_generator,
-    #     steps_per_epoch = train_generator.samples // BATCH_SIZE,
-    #     validation_data = validation_generator, 
-    #     validation_steps = validation_generator.samples // BATCH_SIZE,
-    #     epochs = EPOCHS)
+    model.fit_generator(
+        train_generator,
+        steps_per_epoch = train_generator.samples // BATCH_SIZE,
+        validation_data = validation_generator, 
+        validation_steps = validation_generator.samples // BATCH_SIZE,
+        epochs = EPOCHS)
 
-    # Y_pred = model.predict_generator(validation_generator, num_of_test_samples // batch_size+1)
-    # y_pred = np.argmax(Y_pred, axis=1)
-    # print('Confusion Matrix')
-    # print(confusion_matrix(validation_generator.classes, y_pred))
-    # print('Classification Report')
-    # print(classification_report(validation_generator.classes, y_pred))
+    Y_pred = model.predict_generator(validation_generator, validation_generator.samples  // BATCH_SIZE+1)
+    y_pred = np.argmax(Y_pred, axis=1)
+    print('Confusion Matrix')
+    print(confusion_matrix(validation_generator.classes, y_pred))
+    print('Classification Report')
+    print(classification_report(validation_generator.classes, y_pred))
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
