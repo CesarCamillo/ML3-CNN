@@ -4,36 +4,63 @@ import os
 import numpy as np
 import random
 
+def prepare_Path(destPath, label):
+    switcher = {
+                0:"Janeiro",
+                1:"Fevereiro",
+                2:"Março",
+                3:"Abril",
+                4:"Maio",
+                5:"Junho",
+                6:"Julho",
+                7:"Agosto",
+                8:"Setembro",
+                9:"Outubro",
+                10:"Novembro",
+                11:"Dezembro"
+            }
+    return destPah + "/" + switcher.get(label)
+
 def load_images(originPath, destPath):
     print ('Loading images...')
     archives = os.listdir(originPath)
-    print ('Doing augmentation')	
-    for archive in archives:
-        #Carrega imagem original e inicializa parametros
-        image = cv2.imread(originPath +'/'+ archive)        
+    arq = open('Dados/label.txt')
+	lines = arq.readlines()
+    print ('Doing augmentation')
+    for line in lines:
+		image_name = line.split(' ')[0]
+		label = line.split(' ')[1]
+		label = label.split('\n')
+    	
+        for archive in archives:
+            if archive == image_name:
+                caminhoFinal = prepare_Path(destPath, label)
 
-        #Copia imagem original para a pasta de destino
-        filename = 'Orig_' + archive
-        cv2.imwrite(destPath +'/'+ filename, image)
-        cropImage(image, destPath, filename)
+                #Carrega imagem original e inicializa parametros
+                image = cv2.imread(originPath +'/'+ archive)        
 
-        #Realiza rotacao de 90 graus
-        filename = '90Rot_' + archive
-        rotated90 = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-        cv2.imwrite(destPath +'/'+ filename, rotated90)
-        cropImage(rotated90, destPath, filename)
+                #Copia imagem original para a pasta de destino
+                filename = 'Orig_' + archive
+                cv2.imwrite(caminhoFinal +'/'+ filename, image)
+                cropImage(image, caminhoFinal, filename)
 
-        #Realiza rotacao de 180 graus
-        filename = '180Rot_' + archive
-        rotated180 = cv2.rotate(image, cv2.ROTATE_180)
-        cv2.imwrite(destPath +'/'+ filename, rotated180)
-        cropImage(rotated180, destPath, filename)
+                #Realiza rotacao de 90 graus
+                filename = '90Rot_' + archive
+                rotated90 = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+                cv2.imwrite(caminhoFinal +'/'+ filename, rotated90)
+                cropImage(rotated90, caminhoFinal, filename)
 
-        #Realize rotacao de 270 graus
-        filename = '270Rot_' + archive
-        rotated270 = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        cv2.imwrite(destPath +'/'+ filename, rotated270)
-        cropImage(rotated270, destPath, filename)
+                #Realiza rotacao de 180 graus
+                filename = '180Rot_' + archive
+                rotated180 = cv2.rotate(image, cv2.ROTATE_180)
+                cv2.imwrite(caminhoFinal +'/'+ filename, rotated180)
+                cropImage(rotated180, caminhoFinal, filename)
+
+                #Realize rotacao de 270 graus
+                filename = '270Rot_' + archive
+                rotated270 = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                cv2.imwrite(caminhoFinal +'/'+ filename, rotated270)
+                cropImage(rotated270, caminhoFinal, filename)
 
     print('Done. Take a look into ' + destPath)
 			
