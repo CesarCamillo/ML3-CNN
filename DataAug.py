@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- encoding: iso-8859-1 -*-
+
 ## Script para realizar Data Augmentation
 import cv2
 import os
@@ -6,36 +9,34 @@ import random
 
 def prepare_Path(destPath, label):
     switcher = {
-                0:"Janeiro",
-                1:"Fevereiro",
-                2:"Março",
-                3:"Abril",
-                4:"Maio",
-                5:"Junho",
-                6:"Julho",
-                7:"Agosto",
-                8:"Setembro",
-                9:"Outubro",
-                10:"Novembro",
-                11:"Dezembro"
+                0:'Janeiro',
+                1:'Fevereiro',
+                2:'Março',
+                3:'Abril',
+                4:'Maio',
+                5:'Junho',
+                6:'Julho',
+                7:'Agosto',
+                8:'Setembro',
+                9:'Outubro',
+                10:'Novembro',
+                11:'Dezembro'
             }
-    return destPah + "/" + switcher.get(label)
+    mes = switcher.get(label)
+    return destPath + "/" + str(mes)
 
 def load_images(originPath, destPath):
     print ('Loading images...')
     archives = os.listdir(originPath)
-    arq = open('Dados/label.txt')
-	lines = arq.readlines()
+    arq = open('label.txt')
+    lines = arq.readlines()
     print ('Doing augmentation')
     for line in lines:
-		image_name = line.split(' ')[0]
-		label = line.split(' ')[1]
-		label = label.split('\n')
-    	
+        image_name = line.split(' ')[0]
+        label = line.split(' ')[1]
         for archive in archives:
             if archive == image_name:
-                caminhoFinal = prepare_Path(destPath, label)
-
+                caminhoFinal = prepare_Path(destPath, int(label))
                 #Carrega imagem original e inicializa parametros
                 image = cv2.imread(originPath +'/'+ archive)        
 
