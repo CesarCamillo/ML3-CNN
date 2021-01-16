@@ -87,9 +87,11 @@ print('Test loss:', test_eval[0])
 print('Test accuracy:', test_eval[1])
 
 
-
-accuracy = fashion_train.history['acc']
-val_accuracy = fashion_train.history['val_acc']
+print('*')
+plt.plot(fashion_train.history['accuracy'])
+plt.plot(fashion_train.history['val_accuracy'])
+accuracy = fashion_train.history['accuracy']
+val_accuracy = fashion_train.history['val_accuracy']
 loss = fashion_train.history['loss']
 val_loss = fashion_train.history['val_loss']
 epochs = range(len(accuracy))
