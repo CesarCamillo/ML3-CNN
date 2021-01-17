@@ -76,6 +76,17 @@ def main(caminho):
 
     model.summary()
 
+    predicted_classes = model.predict(train_generator)
+    predicted_classes = np.argmax(np.round(predicted_classes),axis=1)
+    print(predicted_classes.shape)
+
+    Y_pred = model.predict_generator(validation_generator, validation_generator.samples  // BATCH_SIZE+1)
+    y_pred = np.argmax(Y_pred, axis=1)
+    print('Confusion Matrix')
+    print(confusion_matrix(validation_generator.classes, y_pred))
+    print('Classification Report')
+    print(classification_report(validation_generator.classes, y_pred))
+
     test_eval = model.evaluate(train_generator)
 
     print('Test loss:', test_eval[0])
@@ -98,17 +109,6 @@ def main(caminho):
     plt.show()
 
     model.save("model_dropout.h5py")
-
-    predicted_classes = model.predict(train_generator)
-    predicted_classes = np.argmax(np.round(predicted_classes),axis=1)
-    print(predicted_classes.shape)
-
-    Y_pred = model.predict_generator(validation_generator, validation_generator.samples  // BATCH_SIZE+1)
-    y_pred = np.argmax(Y_pred, axis=1)
-    print('Confusion Matrix')
-    print(confusion_matrix(validation_generator.classes, y_pred))
-    print('Classification Report')
-    print(classification_report(validation_generator.classes, y_pred))
 
     # correct = np.where(predicted_classes==test_Y)[0]
     # print("Found %d correct labels" % len(correct))

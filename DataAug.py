@@ -42,6 +42,7 @@ def prepare_Path(destPath, label):
 
 def load_images(originPath, destPath):
     create_Directories(destPath)
+    create_Directories(originPath)
     print ('Loading images...')
     archives = os.listdir(originPath)
     arq = open('label.txt')

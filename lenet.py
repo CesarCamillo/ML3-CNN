@@ -9,7 +9,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 import tensorflow as tf
 import keras
 import keras.layers as layers
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils.np_utils import to_categorical
 from keras.callbacks import TensorBoard
@@ -32,7 +32,7 @@ def main(caminho):
 
     train_generator = train_datagen.flow_from_directory(
         directory = caminho,
-        target_size=(128,128),
+        target_size=(32,32),
         batch_size=BATCH_SIZE,
         class_mode='categorical',
         subset='training',
@@ -41,7 +41,7 @@ def main(caminho):
 
     validation_generator = train_datagen.flow_from_directory(
         directory = caminho, # same directory as training data
-        target_size=(128, 128),
+        target_size=(32, 32),
         batch_size=BATCH_SIZE,
         class_mode='categorical',
         subset='validation',
@@ -50,7 +50,7 @@ def main(caminho):
 
     model = keras.Sequential()
 
-    model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(128,128,1)))
+    model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(32,32,1)))
     model.add(layers.AveragePooling2D())
 
     model.add(layers.Conv2D(filters=16, kernel_size=(3, 3), activation='relu'))
@@ -68,12 +68,12 @@ def main(caminho):
 
     model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])    
 
-    model.fit_generator(
-        train_generator,
-        steps_per_epoch = train_generator.samples // BATCH_SIZE,
-        validation_data = validation_generator, 
-        validation_steps = validation_generator.samples // BATCH_SIZE,
-        epochs = EPOCHS)
+    history = model.fit(
+                train_generator,
+                steps_per_epoch = train_generator.samples // BATCH_SIZE,
+                validation_data = validation_generator, 
+                validation_steps = validation_generator.samples // BATCH_SIZE,
+                epochs = EPOCHS)
 
     Y_pred = model.predict_generator(validation_generator, validation_generator.samples  // BATCH_SIZE+1)
     y_pred = np.argmax(Y_pred, axis=1)
@@ -81,6 +81,24 @@ def main(caminho):
     print(confusion_matrix(validation_generator.classes, y_pred))
     print('Classification Report')
     print(classification_report(validation_generator.classes, y_pred))
+
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    accuracy = history.history['accuracy']
+    val_accuracy = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    epochs = range(len(accuracy))
+    plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
+    plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
+    plt.title('Training and validation accuracy')
+    plt.legend()
+    plt.figure()
+    plt.plot(epochs, loss, 'bo', label='Training loss')
+    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
