@@ -19,14 +19,15 @@ def main (caminho):
     EPOCHS = 10
     BATCH_SIZE = 32
     NUM_CLASSES = 12
-    LINE_NUM = 128
-    COL_NUM = 128
+    LINE_NUM = 128 # Tamanho Mínimo é 32
+    COL_NUM = 128 # Tamanho Mínimo é 32
 
     train_datagen = ImageDataGenerator(rescale=1. / 255,
                                        shear_range=0.2,
                                        zoom_range=0.2,
                                        horizontal_flip=True,
-                                       validation_split=0.1)
+                                       validation_split=0.1,
+                                       featurewise_std_normalization=True)
 
     train_generator = train_datagen.flow_from_directory(
         directory = caminho,
@@ -44,7 +45,7 @@ def main (caminho):
         subset='validation'
     )
 
-    base_model = keras.applications.Xception(
+    base_model = keras.applications.MobileNet(
         weights = 'imagenet',
         input_shape = (LINE_NUM, COL_NUM, 3),
         include_top = False
@@ -53,14 +54,7 @@ def main (caminho):
     base_model.trainable = False
 
     inputs = keras.Input(shape = (LINE_NUM, COL_NUM, 3))
-    x = base_model(inputs)
-
-    norm_layer = keras.layers.experimental.preprocessing.Normalization()
-    mean = np.array([127.5] * 3)
-    var = mean ** 2
-    # Scale inputs to [-1, +1]
-    x = norm_layer(x)
-    norm_layer.set_weights([mean, var])
+    x = base_model(inputs, training = False)
 
     x = keras.layers.GlobalAveragePooling2D()(x)
     x = keras.layers.Dropout(0.2)(x)
@@ -73,6 +67,17 @@ def main (caminho):
     model.compile(
         optimizer = keras.optimizers.Adam(),
         loss = keras.losses.BinaryCrossentropy(from_logits=True),
+        metrics=['accuracy']
+    )
+
+    model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+
+    base_model.trainable = True
+    model.summary()
+
+    model.compile(
+        optimizer=keras.optimizers.Adam(1e-5),  # Low learning rate
+        loss=keras.losses.BinaryCrossentropy(from_logits=True),
         metrics=['accuracy']
     )
 
