@@ -54,29 +54,31 @@ def load_images(originPath, destPath):
         for archive in archives:
             if archive == image_name:
                 caminhoFinal = prepare_Path(destPath, int(label))
+                copiaOrig = prepare_Path(originPath, int(label))
                 #Carrega imagem original e inicializa parametros
                 image = cv2.imread(originPath +'/'+ archive)        
+                cv2.imwrite(copiaOrig + '/' + archive, image)
 
                 #Copia imagem original para a pasta de destino
                 filename = 'Orig_' + archive
                 cv2.imwrite(caminhoFinal +'/'+ filename, image)
                 cropImage(image, caminhoFinal, filename)
 
-                #Realiza rotacao de 90 graus
+                #Realiza rotacao no eixo X
                 filename = '90Rot_' + archive
-                rotated90 = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+                rotated90 = cv2.flip(image, 0)
                 cv2.imwrite(caminhoFinal +'/'+ filename, rotated90)
                 cropImage(rotated90, caminhoFinal, filename)
 
-                #Realiza rotacao de 180 graus
+                #Realiza rotacao no eixo Y
                 filename = '180Rot_' + archive
-                rotated180 = cv2.rotate(image, cv2.ROTATE_180)
+                rotated180 = cv2.flip(image, 1)
                 cv2.imwrite(caminhoFinal +'/'+ filename, rotated180)
                 cropImage(rotated180, caminhoFinal, filename)
 
-                #Realize rotacao de 270 graus
+                #Realize rotacao em ambos os eixos
                 filename = '270Rot_' + archive
-                rotated270 = cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+                rotated270 = cv2.flip(image, -1)
                 cv2.imwrite(caminhoFinal +'/'+ filename, rotated270)
                 cropImage(rotated270, caminhoFinal, filename)
 

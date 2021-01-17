@@ -19,6 +19,8 @@ def main(caminho):
     EPOCHS = 20
     BATCH_SIZE = 128
     NUM_CLASSES = 12
+    LINE_NUM = 128
+    COL_NUM = 64
 
     train_datagen = ImageDataGenerator(rescale=1. / 255,
                                        shear_range=0.2,
@@ -28,7 +30,7 @@ def main(caminho):
 
     train_generator = train_datagen.flow_from_directory(
         directory = caminho,
-        target_size=(32,32),
+        target_size=(LINE_NUM,COL_NUM),
         batch_size=BATCH_SIZE,
         class_mode='categorical',
         subset='training',
@@ -37,7 +39,7 @@ def main(caminho):
 
     validation_generator = train_datagen.flow_from_directory(
         directory = caminho, # same directory as training data
-        target_size=(32, 32),
+        target_size=(LINE_NUM, COL_NUM),
         batch_size=BATCH_SIZE,
         class_mode='categorical',
         subset='validation',
@@ -48,7 +50,7 @@ def main(caminho):
     
 
     model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',padding='same',input_shape=(32,32,1)))
+    model.add(Conv2D(32, kernel_size=(3, 3),activation='linear',padding='same',input_shape=(LINE_NUM, COL_NUM,1)))
     model.add(LeakyReLU(alpha=0.1))
     model.add(MaxPooling2D((2, 2),padding='same'))
     model.add(Dropout(0.25))
