@@ -1,3 +1,5 @@
+# -*- encoding: iso-8859-1 -*-
+
 import numpy as np
 from keras.utils import to_categorical
 import matplotlib.pyplot as plt
