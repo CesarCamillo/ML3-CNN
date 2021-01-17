@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.metrics import classification_report, confusion_matrix
+import tensorflow
 
 import sys
-import keras
+from tensorflow import keras
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential,Input,Model
 from keras.layers import Dense, Dropout, Flatten
@@ -14,13 +15,34 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
 
-
 def main (caminho):
-    EPOCHS = 20
-    BATCH_SIZE = 128
+    EPOCHS = 10
+    BATCH_SIZE = 32
     NUM_CLASSES = 12
     LINE_NUM = 128
-    COL_NUM = 64
+    COL_NUM = 128
+
+    train_datagen = ImageDataGenerator(rescale=1. / 255,
+                                       shear_range=0.2,
+                                       zoom_range=0.2,
+                                       horizontal_flip=True,
+                                       validation_split=0.1)
+
+    train_generator = train_datagen.flow_from_directory(
+        directory = caminho,
+        target_size=(LINE_NUM,COL_NUM),
+        batch_size=BATCH_SIZE,
+        class_mode='categorical',
+        subset='training'
+    )
+
+    validation_generator = train_datagen.flow_from_directory(
+        directory = caminho, # same directory as training data
+        target_size=(LINE_NUM, COL_NUM),
+        batch_size=BATCH_SIZE,
+        class_mode='categorical',
+        subset='validation'
+    )
 
     base_model = keras.applications.Xception(
         weights = 'imagenet',
@@ -31,29 +53,30 @@ def main (caminho):
     base_model.trainable = False
 
     inputs = keras.Input(shape = (LINE_NUM, COL_NUM, 3))
-    x = base_model(inputs, training = False)
-    x = keras.layers.GlobalAveragePooling2D()(x)
-    outputs = keras.layers.Dense(1)(x)
+    x = base_model(inputs)
 
+    norm_layer = keras.layers.experimental.preprocessing.Normalization()
+    mean = np.array([127.5] * 3)
+    var = mean ** 2
+    # Scale inputs to [-1, +1]
+    x = norm_layer(x)
+    norm_layer.set_weights([mean, var])
+
+    x = keras.layers.GlobalAveragePooling2D()(x)
+    x = keras.layers.Dropout(0.2)(x)
+
+    outputs = keras.layers.Dense(12)(x)
     model = keras.Model(inputs, outputs)
-    loss_fn = keras.losses.BinaryCrossentropy(from_logits=True)
-    optimizer = keras.optimizers.Adam()
 
     model.summary()
 
-    for inputs, targets in new_dataset:
-        # Open a GradientTape.
-        with tf.GradientTape() as tape:
-            # Forward pass.
-            predictions = model(inputs)
-            # Compute the loss value for this batch.
-            loss_value = loss_fn(targets, predictions)
+    model.compile(
+        optimizer = keras.optimizers.Adam(),
+        loss = keras.losses.BinaryCrossentropy(from_logits=True),
+        metrics=['accuracy']
+    )
 
-        # Get gradients of loss wrt the *trainable* weights.
-        gradients = tape.gradient(loss_value, model.trainable_weights)
-        # Update the weights of the model.
-        optimizer.apply_gradients(zip(gradients, model.trainable_weights))
-
+    model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
