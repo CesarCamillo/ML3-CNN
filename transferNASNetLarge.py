@@ -60,8 +60,13 @@ def main (caminho):
 
     x = keras.layers.GlobalAveragePooling2D()(x)
     x = keras.layers.Dropout(0.2)(x)
+    #As camas as seguir são adicionadas para simular o comportamento de SVM posteriormente
+    x = keras.layers.Dense(64, activation='relu')(x)
+    x = keras.layers.Dense(1), W_regularizer=l2(0.01))(x)
+    x = keras.layers.activation('linear'))(x)
 
     outputs = keras.layers.Dense(12)(x)
+
     model = keras.Model(inputs, outputs)
 
     model.summary()
@@ -84,6 +89,15 @@ def main (caminho):
     )
 
     model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+
+
+    #Compilar programa estilo SVM usando outros dados, utilizado hinge por dar um menor valor de perda
+    model.compile(loss='hinge',
+                optimizer='adadelta',
+                metrics=['accuracy'])
+
+    model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
