@@ -21,8 +21,8 @@ def main (caminho):
     EPOCHS = 10
     BATCH_SIZE = 32
     NUM_CLASSES = 12
-    LINE_NUM = 128 # Tamanho Mínimo é 32
-    COL_NUM = 128 # Tamanho Mínimo é 32
+    LINE_NUM = 128
+    COL_NUM = 64
 
     train_datagen = ImageDataGenerator(rescale=1. / 255,
                                        shear_range=0.2,
@@ -47,10 +47,10 @@ def main (caminho):
         subset='validation'
     )
 
-    base_model = keras.applications.NASNetMobile(
+    base_model = keras.applications.EfficientNetB2(
         weights = 'imagenet',
+        include_top = False,
         input_shape = (LINE_NUM, COL_NUM, 3),
-        include_top = False
     )
 
     base_model.trainable = False

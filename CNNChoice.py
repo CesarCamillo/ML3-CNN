@@ -101,14 +101,15 @@ def main(caminho):
     epochs = range(len(accuracy))
     plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
     plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
-    plt.title('Training and validation accuracy')
+    plt.title('Training and validation accuracy - CNNChoice')
     plt.legend()
+    plt.savefig('Resultados/Imagens/Choice_Acc_' + caminho)
     plt.figure()
     plt.plot(epochs, loss, 'bo', label='Training loss')
     plt.plot(epochs, val_loss, 'b', label='Validation loss')
-    plt.title('Training and validation loss')
+    plt.title('Training and validation loss - CNNChoice')
     plt.legend()
-    plt.show()
+    plt.savefig('Resultados/Imagens/Choice_Loss_' + caminho)
 
     model.save("model_dropout.h5py")
 

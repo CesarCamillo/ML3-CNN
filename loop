@@ -1,0 +1,27 @@
+#!/bin/bash
+
+mkdir -p Resultados
+mkdir -p Resultados/Imagens
+
+echo > Resultados/lenet_simples
+echo > Resultados/lenet_aug
+echo > Resultados/choice_simples
+echo > Resultados/choice_aug
+echo > Resultados/transfer1_simples
+echo > Resultados/transfer1_aug
+echo > Resultados/transfer2_simples
+echo > Resultados/transfer2_aug
+
+python3 lenet.py Dados |& tee -a Resultados/lenet_simples
+# python3 lenet.py DadosAug |& tee -a Resultados/lenet_aug
+
+# python3 CNNChoice.py Dados |& tee -a Resultados/choice_simples
+# python3 CNNChoice.py DadosAug |& tee -a Resultados/choice_aug
+
+# python3 transferNASNetLarge.py Dados |& tee -a Resultados/transfer1_simples
+# python3 transferNASNetLarge.py DadosAug |& tee -a Resultados/transfer1_aug
+
+# python3 transferXception.py Dados |& tee -a Resultados/transfer2_simples
+# python3 transferXception.py DadosAug |& tee -a Resultados/transfer2_aug
+
+

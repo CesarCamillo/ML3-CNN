@@ -16,10 +16,8 @@ from keras.callbacks import TensorBoard
 
 # %matplotlib inline
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 def main(caminho):
-    sns.set()    
 
     EPOCHS = 20
     BATCH_SIZE = 128
@@ -91,14 +89,15 @@ def main(caminho):
     epochs = range(len(accuracy))
     plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
     plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
-    plt.title('Training and validation accuracy')
+    plt.title('Training and validation accuracy - LeNet 5')
     plt.legend()
+    plt.savefig('Resultados/Imagens/LeNet5_Acc_' + caminho)
     plt.figure()
     plt.plot(epochs, loss, 'bo', label='Training loss')
     plt.plot(epochs, val_loss, 'b', label='Validation loss')
-    plt.title('Training and validation loss')
+    plt.title('Training and validation loss - LeNet 5' + caminho)
     plt.legend()
-    plt.show()
+    plt.savefig('Resultados/LeNet5_Loss_' + caminho)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
