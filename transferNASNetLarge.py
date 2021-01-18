@@ -126,6 +126,7 @@ def main (caminho):
     loss = history.history['loss']
     val_loss = history.history['val_loss']
     epochs = range(len(accuracy))
+    plt.figure()
     plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
     plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
     plt.title('Training and validation accuracy - Transfer EfficientNetB2 Fine Tuning')
