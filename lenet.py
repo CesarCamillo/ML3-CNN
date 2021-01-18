@@ -97,7 +97,7 @@ def main(caminho):
     plt.plot(epochs, val_loss, 'b', label='Validation loss')
     plt.title('Training and validation loss - LeNet 5' + caminho)
     plt.legend()
-    plt.savefig('Resultados/LeNet5_Loss_' + caminho)
+    plt.savefig('Resultados/Imagens/LeNet5_Loss_' + caminho)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

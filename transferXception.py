@@ -22,13 +22,13 @@ def main (caminho):
     BATCH_SIZE = 32
     NUM_CLASSES = 12
     LINE_NUM = 128 # Tamanho Mínimo é 32
-    COL_NUM = 128 # Tamanho Mínimo é 32
+    COL_NUM = 64 # Tamanho Mínimo é 32
 
     train_datagen = ImageDataGenerator(rescale=1. / 255,
                                        shear_range=0.2,
                                        zoom_range=0.2,
                                        horizontal_flip=True,
-                                       validation_split=0.1,
+                                       validation_split=0.2,
                                        featurewise_std_normalization=True)
 
     train_generator = train_datagen.flow_from_directory(
@@ -61,29 +61,81 @@ def main (caminho):
     x = keras.layers.GlobalAveragePooling2D()(x)
     x = keras.layers.Dropout(0.2)(x)
 
-    outputs = keras.layers.Dense(12)(x)
+    outputs = keras.layers.Dense(12, kernel_regularizer=keras.regularizers.L2(0.01), activation='linear')(x)
     model = keras.Model(inputs, outputs)
 
     model.summary()
 
     model.compile(
-        optimizer = keras.optimizers.Adam(),
-        loss = keras.losses.BinaryCrossentropy(from_logits=True),
+        loss='hinge',
+        optimizer='adadelta',
         metrics=['accuracy']
     )
 
-    model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+    history = model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+
+    Y_pred = model.predict_generator(validation_generator, validation_generator.samples  // BATCH_SIZE+1)
+    y_pred = np.argmax(Y_pred, axis=1)
+    print('Confusion Matrix')
+    print(confusion_matrix(validation_generator.classes, y_pred))
+    print('Classification Report')
+    print(classification_report(validation_generator.classes, y_pred))
+
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    accuracy = history.history['accuracy']
+    val_accuracy = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    epochs = range(len(accuracy))
+    plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
+    plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
+    plt.title('Training and validation accuracy - Transfer MobileNet')
+    plt.legend()
+    plt.savefig('Resultados/Imagens/Transfer2_Acc_' + caminho)
+    plt.figure()
+    plt.plot(epochs, loss, 'bo', label='Training loss')
+    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.title('Training and validation loss - Transfer MobileNet' + caminho)
+    plt.legend()
+    plt.savefig('Resultados/Imagens/Transfer2_Loss_' + caminho)
 
     base_model.trainable = True
     model.summary()
 
     model.compile(
-        optimizer=keras.optimizers.Adam(1e-5),  # Low learning rate
-        loss=keras.losses.BinaryCrossentropy(from_logits=True),
+        loss='hinge',
+        optimizer='adadelta',
         metrics=['accuracy']
     )
 
-    model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+    history = model.fit(train_generator, epochs = EPOCHS, validation_data = validation_generator)
+
+    Y_pred = model.predict_generator(validation_generator, validation_generator.samples  // BATCH_SIZE+1)
+    y_pred = np.argmax(Y_pred, axis=1)
+    print('Confusion Matrix')
+    print(confusion_matrix(validation_generator.classes, y_pred))
+    print('Classification Report')
+    print(classification_report(validation_generator.classes, y_pred))
+
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    accuracy = history.history['accuracy']
+    val_accuracy = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    epochs = range(len(accuracy))
+    plt.plot(epochs, accuracy, 'bo', label='Training accuracy')
+    plt.plot(epochs, val_accuracy, 'b', label='Validation accuracy')
+    plt.title('Training and validation accuracy - Transfer MobileNet Fine Tuning')
+    plt.legend()
+    plt.savefig('Resultados/Imagens/Transfer2FT_Acc_' + caminho)
+    plt.figure()
+    plt.plot(epochs, loss, 'bo', label='Training loss')
+    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.title('Training and validation loss - Transfer MobileNet Fine Tuning' + caminho)
+    plt.legend()
+    plt.savefig('Resultados/Imagens/Transfer2FT_Loss_' + caminho)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
